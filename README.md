@@ -179,11 +179,11 @@ export default function () {
 
 Após termos explorado o processo de execução de testes de carga usando o k6, vamos agora aprofundar nosso entendimento sobre as métricas avançadas que essa ferramenta disponibiliza.
 
-### O que são Métricas no k6?
+## O que são Métricas no k6?
 
 Métricas no k6 são valores coletados durante os testes de desempenho. Elas permitem analisar a performance do sistema de várias perspectivas, oferecendo insights sobre tempos de resposta, latência, taxas de transferência, erros, entre outros.
 
-## Métricas Integradas
+### Métricas Integradas
 
 O k6 possui várias métricas internas que são automaticamente coletadas durante os testes. Aqui estão algumas das mais importantes:
 
@@ -202,7 +202,7 @@ O k6 possui várias métricas internas que são automaticamente coletadas durant
 - http_req_waiting: Mede o tempo que a requisição passa em espera no servidor.
 
 
-## Métricas Personalizadas
+### Métricas Personalizadas
 
 O k6 também permite criar métricas personalizadas para capturar dados que não são coletados automaticamente. Isso pode ser feito usando uma das quatro funções de métrica personalizada: Counter, Gauge, Rate e Trend.
 
@@ -228,12 +228,18 @@ export default function () {
 }
 ```
 
-## Visualização de Métricas
+### Visualização de Métricas
 
 ![image](https://github.com/djesusnet/k6/assets/50085026/e5c35c29-b164-4e77-ac26-0bf55ee00d7c)
 
 
-## Checks - Verificações
+
+
+
+
+
+
+## Checks (Verificações)
 
 No k6, "checks" são usados para validar o comportamento e o desempenho de um sistema durante um teste de carga. Eles são essencialmente asserções que retornam true ou false dependendo se a condição especificada foi atendida.
 
@@ -253,13 +259,236 @@ export default function () {
 }
 ```
 
+Neste caso, o "check" verificará se o status HTTP da resposta é 200. Se for, o "check" passará; caso contrário, falhará.
+
+### Verificar o Tempo de Resposta
+
+Você também pode verificar o tempo de resposta. Por exemplo, para verificar se o tempo de resposta é menor que 200 milissegundos:
+
+```js
+check(res, {
+  'response time is less than 200ms': (r) => r.timings.duration < 200,
+});
+```
+
+## Verificar Conteúdo da Resposta
+
+Também é possível verificar o conteúdo da resposta para validar se é o esperado:
+
+```js
+check(res, {
+  'body contains "Welcome"': (r) => r.body.indexOf('Welcome') !== -1,
+});
+```
+
+### Múltiplos Checks
+
+Você pode ter múltiplos "checks" para uma única resposta:
+
+```js
+check(res, {
+  'status is 200': (r) => r.status === 200,
+  'response time is less than 200ms': (r) => r.timings.duration < 200,
+  'body contains "Welcome"': (r) => r.body.indexOf('Welcome') !== -1,
+});
+```
+
+### Contando Checks Passados e Falhos
+
+Os "checks" são especialmente úteis porque o k6 os contará para você. No final de uma execução de teste, você pode ver quantos dos seus "checks" passaram e quantos falharam, fornecendo um resumo fácil de entender do comportamento do seu sistema sob carga.
+
+Esses são exemplos básicos. A funcionalidade de "checks" é bastante flexível e permite uma ampla gama de asserções para validar o comportamento e desempenho do sistema que você está testando.
+
+![image](https://github.com/djesusnet/k6/assets/50085026/4d2eedcf-79e3-44f6-8974-a02cfe7396c9)
 
 
+## Thresholds (Limiares) 
 
+Os "Thresholds" (Limiares) em k6 são um mecanismo poderoso para definir critérios de sucesso ou falha de um teste de carga. Enquanto os "checks" fornecem uma maneira de validar a resposta a cada requisição individual, os "thresholds" permitem especificar limites agregados que não devem ser ultrapassados durante a execução do teste inteiro. Se algum desses limites for ultrapassado, o k6 marcará o teste como falho ao terminar a execução.
 
+Isso é útil para impor padrões de qualidade em seu código e infraestrutura, pois você pode configurar seu ambiente de CI/CD para parar o processo de implantação se algum limite for ultrapassado.
 
+### Exemplo 1: Tempo de Resposta Médio
 
+Suponhamos que você queira que o tempo de resposta médio durante o teste inteiro seja menor que 200 milissegundos. Você pode definir um limiar para isso da seguinte forma:
 
+```js
+import http from 'k6/http';
+import { check } from 'k6';
+
+export let options = {
+  thresholds: {
+    'http_req_duration': ['avg<200'],  // tempo de resposta médio deve ser menor que 200 ms
+  },
+};
+
+export default function () {
+  let res = http.get('http://test.k6.io');
+  check(res, {'status is 200': (r) => r.status === 200});
+}
+```
+
+### Exemplo 2: Taxa de Sucesso
+
+Digamos que você também queira garantir que pelo menos 95% de todas as requisições sejam bem-sucedidas. Você pode adicionar um novo limiar para a taxa de sucesso:
+
+```js
+export let options = {
+  thresholds: {
+    'checks': ['rate>0.95'],  // taxa de sucesso deve ser maior que 95%
+  },
+};
+```
+
+### Exemplo 3: Múltiplos Limiares
+
+Você também pode combinar múltiplos limiares:
+
+```js
+export let options = {
+  thresholds: {
+    'http_req_duration': ['avg<200', 'p(95)<400'],
+    'checks': ['rate>0.95'],
+  },
+};
+```
+
+Neste exemplo, estamos definindo três limiares:
+
+1. O tempo de resposta médio (avg) deve ser menor que 200 ms.
+2. O tempo de resposta no percentil 95 (p(95)) deve ser menor que 400 ms.
+3. A taxa de sucesso dos "checks" deve ser maior que 95%.
+
+Se algum desses limiares for violado durante a execução do teste, o k6 sairá com um código de saída diferente de zero, indicando falha, o que é útil para integração com sistemas de CI/CD.
+
+Esses são apenas exemplos simples. Os limiares são um recurso muito flexível em k6, permitindo que você defina critérios de sucesso ou falha com base em diversas métricas e estatísticas.
+
+## Options (Opções) 
+
+No k6, "Options" (Opções) são configurações que permitem controlar diversos aspectos de um teste de carga, como o número de Usuários Virtuais (VUs), a duração do teste, os limiares (thresholds) e muitos outros parâmetros. Essas opções podem ser definidas diretamente na linha de comando ou dentro do próprio script de teste. Algumas das opções mais comuns incluem:
+
+### Número de VUs
+
+Define o número de Usuários Virtuais (VUs) que executarão o teste. Exemplo:
+
+```js
+export let options = {
+  vus: 10,
+};
+```
+
+### Duração do Teste
+
+Especifica a duração total do teste. Exemplo:
+
+```js
+export let options = {
+  duration: '30s',
+};
+```
+
+### Stages (Estágios)
+
+Permite escalonar o número de VUs ao longo do tempo. Isso é útil para simular cenários mais complexos de carga e descarga. Exemplo:
+
+```js
+export let options = {
+  stages: [
+    { duration: '30s', target: 10 },
+    { duration: '1m', target: 20 },
+    { duration: '30s', target: 0 },
+  ],
+};
+```
+
+### Thresholds (Limiares)
+
+Permite definir critérios de sucesso ou falha para o teste com base em métricas específicas. Exemplo:
+
+```js
+export let options = {
+  thresholds: {
+    'http_req_duration': ['avg<100', 'p(95)<200'],
+  },
+};
+```
+
+### Tags
+
+Essas opções permitem organizar seus testes e requisições de forma mais significativa. Exemplo:
+
+```js
+export let options = {
+  tags: { my_custom_tag: 'value' },
+};
+```
+
+### Outras Opções
+
+Existem muitas outras opções que controlam outros aspectos dos testes, como limites de taxa de requisição, opções de protocolo HTTP e muito mais.
+
+As opções podem também ser combinadas para fornecer um controle muito granular sobre como o teste é executado. Por exemplo:
+
+```js
+export let options = {
+  vus: 10,
+  duration: '30s',
+  thresholds: {
+    'http_req_duration': ['avg<100'],
+  },
+};
+```
+
+Neste exemplo, o teste será executado com 10 VUs por 30 segundos, e exigirá que o tempo de resposta médio seja menor que 100 milissegundos.
+
+Definir opções é um aspecto fundamental do design de testes de carga com k6, permitindo que você ajuste o comportamento do teste para se adequar às suas necessidades específicas.
+
+## O ciclo de vida de um teste
+
+O ciclo de vida de um teste em k6 é relativamente simples de entender, mas oferece bastante flexibilidade para criar cenários de teste de carga complexos. Aqui estão as etapas básicas:
+
+### 1. Inicialização
+
+Na fase de inicialização, o k6 executa todo o código fora das funções default ou export default. Isso inclui a importação de bibliotecas e a definição de configurações globais e opções de teste (options). A inicialização ocorre apenas uma vez, independentemente do número de VUs (Usuários Virtuais) envolvidos no teste.
+
+### 2. Preparação (Opcional)
+
+Se você definiu uma função setup, o k6 a executará antes de iniciar os VUs. Esta etapa é útil para preparar o estado do teste, como autenticação ou criação de dados que serão usados por todos os VUs.
+
+```js
+export function setup() {
+  // Código de preparação aqui
+}
+```
+
+### 3. Teste Principal
+
+Esta é a fase onde os VUs executam a função default (ou a função exportada como default). Esta função contém o "corpo" do seu teste: as requisições HTTP, os "checks", as métricas personalizadas e assim por diante. Cada VU executa esta função repetidamente durante o tempo definido nas opções ou até que outras condições de término sejam atendidas.
+
+```js
+export default function() {
+  // Código de teste aqui
+}
+```
+
+### 4. Limpeza (Opcional)
+
+Se você definiu uma função teardown, o k6 a executará após todos os VUs terem completado a execução. Essa etapa é útil para limpar qualquer estado ou recurso que você tenha configurado.
+
+```js
+export function teardown() {
+  // Código de limpeza aqui
+}
+```
+
+### 5. Resultados e Relatórios
+
+Depois que o teste é concluído, o k6 exibe um resumo das métricas coletadas durante o teste. Se você estiver usando a versão em nuvem do k6, esses resultados podem ser enviados para a nuvem para análise mais detalhada.
+
+Observações Importantes:
+A função setup e a função teardown são executadas apenas uma vez durante o ciclo de vida do teste, independentemente do número de VUs.
+As variáveis globais definidas na fase de inicialização não são compartilhadas entre VUs. Cada VU tem seu próprio espaço de memória isolado.
+Compreender o ciclo de vida do teste em k6 é crucial para escrever testes eficazes e interpretar corretamente os resultados.
 
 
 
