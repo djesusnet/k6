@@ -206,9 +206,27 @@ O k6 possui várias métricas internas que são automaticamente coletadas durant
 
 O k6 também permite criar métricas personalizadas para capturar dados que não são coletados automaticamente. Isso pode ser feito usando uma das quatro funções de métrica personalizada: Counter, Gauge, Rate e Trend.
 
+Aqui está um exemplo simples usando métricas personalizadas em um script k6:
 
+```js
+import http from 'k6/http';
+import { Counter, Rate } from 'k6/metrics';
 
+// Definir métricas personalizadas
+var myCounter = new Counter('my_custom_counter');
+var myRate = new Rate('my_custom_rate');
 
+export default function () {
+  // Fazer uma requisição HTTP
+  let res = http.get('http://test.k6.io');
+
+  // Incrementar o contador personalizado
+  myCounter.add(1);
+
+  // Adicionar valor à métrica de taxa (1 se a requisição for bem-sucedida, 0 caso contrário)
+  myRate.add(res.status === 200);
+}
+```
 
 
 
