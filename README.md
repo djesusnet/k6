@@ -233,6 +233,29 @@ export default function () {
 ![image](https://github.com/djesusnet/k6/assets/50085026/e5c35c29-b164-4e77-ac26-0bf55ee00d7c)
 
 
+## Checks - Verificações
+
+No k6, "checks" são usados para validar o comportamento e o desempenho de um sistema durante um teste de carga. Eles são essencialmente asserções que retornam true ou false dependendo se a condição especificada foi atendida.
+
+### Verificar o Status HTTP
+
+O exemplo mais simples de um "check" é validar o código de status HTTP de uma resposta. Veja o exemplo abaixo:
+
+```js
+import http from 'k6/http';
+import { check } from 'k6';
+
+export default function () {
+  let res = http.get('http://test.k6.io');
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+}
+```
+
+
+
+
 
 
 
