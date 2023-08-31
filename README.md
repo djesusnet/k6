@@ -228,6 +228,9 @@ export default function () {
 }
 ```
 
+## Visualização de Métricas
+
+![image](https://github.com/djesusnet/k6/assets/50085026/e5c35c29-b164-4e77-ac26-0bf55ee00d7c)
 
 
 
