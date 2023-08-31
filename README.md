@@ -539,12 +539,53 @@ export default function () {
 }
 
 ```
+### Módulo k6 reporter
+
+Esta extensão para K6 deve ser usada adicionando-se ao código de teste K6 (JavaScript) e utiliza o gancho de retorno de chamada handleSummary , adicionado ao K6 v0.30.0. Quando o seu teste for concluído, um arquivo HTML será gravado no sistema de arquivos, contendo uma versão formatada e fácil de consumir dos dados de resumo do teste.
+
+Para usar, adicione este módulo ao seu código de teste.
+
+Importe a htmlReportfunção do módulo incluído hospedado remotamente no GitHub
+
+```js
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+```
+
+Então, fora da função padrão do teste, envolva-o com a handleSummary(data)função que K6 chama no final de qualquer test , como segue:
+
+```js
+import GetContacts from "./scenarios/contacts.js";
+import GetNews from "./scenarios/news.js";
+import {group , sleep} from 'k6';
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 
+export function handleSummary(data) {
+  return {
+    "summary.html": htmlReport(data),
+  };
+}
 
+export default() =>{
 
+  group('Endpoint Get Contacts - API k6', () => {
+    GetContacts();
+  });
 
+  group('Endpoint Get News - API k6', () => {
+    GetNews();
+ });
 
+}
+```
+
+![image](https://github.com/djesusnet/k6/assets/50085026/c816f4be-4654-4af6-af35-cf7601d1d9ab)
+
+![image](https://github.com/djesusnet/k6/assets/50085026/ac6425b0-5ddf-406e-a5c1-aca841508232)
+
+Video: https://www.youtube.com/watch?v=8S9fxDqJlng&ab_channel=DanielJesus
+
+código: https://github.com/benc-uk/k6-reporter
 
 
 
