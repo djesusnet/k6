@@ -491,6 +491,56 @@ As variáveis globais definidas na fase de inicialização não são compartilha
 Compreender o ciclo de vida do teste em k6 é crucial para escrever testes eficazes e interpretar corretamente os resultados.
 
 
+## Importando módulos
+
+É comum importar módulos, ou partes de módulos, para usar em scripts de teste. No k6, você pode importar três tipos diferentes de módulos:
+
+- Módulos integrados
+- Módulos de sistema de arquivos locais
+- Módulos HTTP(S) remotos
+
+### Módulos integrados
+
+k6 fornece muitos módulos integrados para funcionalidades principais. Por exemplo, ohttpcliente faz solicitações no sistema em teste. Para obter a lista completa de módulos integrados, consulte a documentação da API .
+
+```js
+import http from 'k6/http';
+```
+
+### Módulos de sistema de arquivos locais
+
+Esses módulos são armazenados no sistema de arquivos local e acessados ​​por meio de caminhos relativos ou absolutos do sistema de arquivos. Para tornar os módulos do sistema de arquivos locais compatíveis com k6, o próprio módulo pode usar apenas importações relativas ou absolutas do sistema de arquivos para acessar suas dependências.
+
+```js
+//helpers.js
+export function someHelper() {
+  // ...
+}
+```
+
+```js
+//my-test.js
+import { someHelper } from './helpers.js';
+
+export default function () {
+  someHelper();
+}
+```
+
+### Módulos HTTP(S) remotos
+
+Esses módulos são acessados ​​por HTTP(S), de uma fonte como o k6 JSLib ou de qualquer servidor web acessível publicamente. Os módulos importados são baixados e executados em tempo de execução, por isso é extremamente importante ter certeza de que você confia no código antes de incluí-lo em um script de teste .
+
+```js
+import { randomItem } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+export default function () {
+  randomItem();
+}
+
+```
+
+
 
 
 
