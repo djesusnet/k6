@@ -914,6 +914,61 @@ Esses são apenas alguns exemplos. O recurso de Scenarios é muito flexível e p
 Doc: https://k6.io/docs/using-k6/scenarios/
 
 
+## Saída de dados (Out)
+
+O termo "out" no contexto do k6 refere-se à saída de dados, ou seja, onde o k6 enviará as métricas coletadas durante a execução dos testes. Por padrão, o k6 exibirá um resumo das métricas no terminal após a execução do teste. No entanto, em casos de uso mais avançados, você pode querer exportar essas métricas para um sistema externo para análise posterior, alertas ou integração com outras ferramentas.
+
+O k6 suporta vários "outputs" (saídas), que podem ser especificados através da opção --out na linha de comando ou dentro do seu script de teste. Alguns dos outputs mais comuns são:
+
+### InfluxDB
+
+InfluxDB é um banco de dados de séries temporais popular para armazenar métricas. Você pode executar o k6 para enviar métricas diretamente para um banco de dados InfluxDB.
+
+```
+k6 run --out influxdb=http://localhost:8086/myk6db script.js
+```
+
+### Grafana
+
+Embora o Grafana em si não seja um output, ele é frequentemente usado em conjunto com o InfluxDB para visualizar as métricas do k6 em um painel de controle.
+
+### JSON
+
+No k6, você pode exportar as métricas coletadas para um arquivo JSON usando a opção --out json=<nome_do_arquivo>. Isso permite que você armazene os dados para análises mais detalhadas posteriormente. O arquivo JSON resultante terá um objeto JSON por linha para cada ponto de dados de métrica.
+
+```
+k6 run --out json=resultado.json script.js
+```
+
+#### Exemplo de um script de teste k6 simples (script.js):
+
+```js
+import http from 'k6/http';
+
+export default function () {
+  http.get('http://example.com');
+}
+```
+
+#### Exemplo simplificado de saída JSON (resultado.json)
+
+```js
+{"type":"Point","data":{"time":"2023-09-03T14:25:43.511Z","value":200,"tags":{"group":"","method":"GET","name":"http://example.com","proto":"HTTP/1.1","scenario":"default","status":"200","url":"http://example.com","vu":1}},"metric":"http_req_status"}
+{"type":"Point","data":{"time":"2023-09-03T14:25:43.511Z","value":123.45,"tags":{"group":"","method":"GET","name":"http://example.com","proto":"HTTP/1.1","scenario":"default","status":"200","url":"http://example.com","vu":1}},"metric":"http_req_duration"}
+```
+
+Este é um exemplo muito simplificado e a saída real conteria muitos mais pontos de dados para diversas métricas, como http_req_blocked, http_req_connecting, http_req_tls_handshaking, http_req_waiting, etc.
+
+Cada objeto JSON representa um ponto de dados para uma métrica específica. O campo metric especifica o nome da métrica, e o campo data contém detalhes como o tempo em que a medição foi feita, o valor da métrica e várias tags para fornecer contexto adicional (URL, método HTTP, etc.).
+
+Você pode então importar este arquivo JSON para ferramentas de análise de dados, bancos de dados ou até mesmo processá-lo manualmente para extrair informações úteis.
+
+
+### Testes de Stress com K6 e Monitoramento Visual no Grafana + InfluxDB
+
+
+
+
 
 
 
