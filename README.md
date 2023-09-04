@@ -587,6 +587,343 @@ Video: https://www.youtube.com/watch?v=8S9fxDqJlng&ab_channel=DanielJesus
 
 código: https://github.com/benc-uk/k6-reporter
 
+## Tags
+
+Tags são pares chave-valor que podem ser anexados a métricas específicas para fornecer contexto adicional ou para facilitar a filtragem e análise posterior dos dados coletados durante um teste.
+
+Por exemplo, você pode adicionar uma tag para indicar o ambiente em que o teste foi executado (como "produção" ou "desenvolvimento"), o tipo de recurso que está sendo testado (como "API" ou "UI"), entre outros.
+
+Aqui está um exemplo de como você poderia adicionar tags a uma requisição HTTP em k6:
+
+```js
+import http from 'k6/http';
+
+export default function () {
+  const res = http.get('https://example.com', {
+    tags: { nome: 'requisicaoPrincipal', ambiente: 'producao' },
+  });
+}
+```
+
+## Groups
+
+Groups são uma maneira de organizar partes do seu código de teste em blocos lógicos. Isso facilita a leitura do código e também ajuda na organização das métricas coletadas durante o teste.
+
+Por exemplo:
+
+```js
+import { group } from 'k6';
+import http from 'k6/http';
+
+export default function () {
+  group('grupoPrincipal', function () {
+    http.get('https://example.com');
+  
+    group('subgrupo', function () {
+      http.get('https://example.com/subpagina');
+    });
+  });
+}
+```
+
+Neste exemplo, todas as métricas coletadas dentro do bloco grupoPrincipal serão agrupadas sob essa etiqueta. O mesmo acontece para o subgrupo. Isso facilita a visualização e análise das métricas depois que o teste foi executado.
+
+## Cookies
+
+No k6, você pode manipular cookies de diversas formas. A biblioteca possui um objeto http.cookieJar() que permite que você obtenha ou defina cookies para um domínio específico. Além disso, os cookies definidos em respostas HTTP são automaticamente armazenados e enviados em solicitações subsequentes, imitando o comportamento de um navegador web.
+
+Aqui estão alguns exemplos de como você pode trabalhar com cookies no k6:
+
+### Definindo cookies manualmente
+
+Você pode definir cookies usando o método jar.set():
+
+```js
+import http from 'k6/http';
+import { CookieJar } from 'k6/http';
+
+const jar = new CookieJar();
+
+export default function () {
+  jar.set('https://example.com', 'meuCookie', 'meuValor', { domain: 'example.com' });
+
+  const res = http.get('https://example.com', { cookies: jar.cookiesForURL('https://example.com') });
+}
+```
+
+### Utilizando cookies definidos pelo servidor
+
+Se um servidor definir um cookie, ele será automaticamente armazenado e enviado nas próximas requisições:
+
+```js
+import http from 'k6/http';
+
+export default function () {
+  // Suponha que esta requisição defina um cookie
+  http.get('https://example.com/set-cookie');
+
+  // O cookie será incluído automaticamente nesta requisição
+  http.get('https://example.com/use-cookie');
+}
+```
+
+### Lendo cookies de uma resposta
+
+Você também pode ler os cookies a partir da resposta de uma requisição HTTP:
+
+```js
+import http from 'k6/http';
+
+export default function () {
+  const res = http.get('https://example.com');
+
+  const cookies = res.cookies;
+  const meuCookie = cookies['meuCookie'][0];
+  console.log(`Meu cookie: ${meuCookie.value}`);
+}
+```
+
+Note que o campo cookies na resposta é um objeto onde cada chave é o nome de um cookie e o valor associado é uma matriz, já que é possível ter múltiplos cookies com o mesmo nome, mas diferentes atributos (como domínio ou caminho).
+
+## Protocolos
+
+O k6 oferece suporte a vários protocolos comuns usados em testes de desempenho web. Aqui estão alguns dos protocolos mais notáveis:
+
+### HTTP/1.1 e HTTP/2
+
+O k6 possui um excelente suporte para HTTP/1.1 e HTTP/2, permitindo testes abrangentes de APIs REST, sites e outras aplicações web.
+
+Testar um endpoint HTTP é simples. O código abaixo faz uma requisição GET para o site example.com.
+
+```js
+import http from 'k6/http';
+
+export default function () {
+  http.get('http://example.com');
+}
+```
+
+### WebSocket
+
+O k6 também oferece suporte a WebSockets, o que é útil para testar aplicações em tempo real.
+Para testar um WebSocket, você usaria o módulo k6/ws. Aqui está um exemplo que se conecta a um WebSocket e envia/recebe uma mensagem:
+
+```js
+import ws from 'k6/ws';
+
+export default function () {
+  const url = 'ws://example.com/socket';
+  const params = { tags: { my_tag: 'hello' } };
+
+  ws.connect(url, params, function (socket) {
+    socket.on('open', function () {
+      console.log('Connected.');
+      socket.send('Hello, server!');
+    });
+
+    socket.on('message', function (data) {
+      console.log(`Received message: ${data}`);
+    });
+
+    socket.on('close', function () {
+      console.log('Disconnected.');
+    });
+  });
+}
+```
+
+### gRPC
+
+Recentemente, o k6 adicionou suporte para testes gRPC, que é um protocolo de alto desempenho para comunicações de sistema distribuído.
+O suporte a gRPC foi introduzido em versões mais recentes do k6 e permite testar serviços gRPC. A biblioteca k6/net/grpc fornece as ferramentas necessárias.
+
+
+```js
+import grpc from 'k6/net/grpc';
+import { check } from 'k6';
+
+const client = new grpc.Client();
+client.load(['../path/to/protobuf/files'], 'ServiceName');
+
+export default () => {
+  client.connect('grpc://localhost:8080', {
+    // Configurações opcionais
+  });
+
+  const response = client.invoke('packageName.ServiceName/MethodName', {
+    // dados da requisição
+  });
+
+  check(response, {
+    'status is OK': (r) => r && r.status === grpc.StatusOK,
+  });
+
+  client.close();
+};
+```
+
+### Outros protocolos e integrações
+
+Além dos protocolos mencionados, o k6 tem um ecossistema de plugins e integrações que podem estender suas capacidades para suportar outros protocolos como MQTT, Apache Kafka, e mais. No entanto, essas extensões geralmente vêm da comunidade ou são contribuições externas e podem não ter o mesmo nível de suporte ou integração que os protocolos nativamente suportados.
+
+Docc : https://k6.io/docs/using-k6/protocols/
+
+## Scenarios (Cenários)
+
+O k6 introduziu um novo conceito chamado "Scenarios" em versões mais recentes (v0.27.0 e posteriores) que permite uma configuração mais rica e flexível dos testes. Com Scenarios, você pode especificar múltiplos fluxos de execução em um único script de teste, cada um com suas próprias configurações, como VUs (Virtual Users), duração, etapas e outros.
+
+Aqui estão alguns dos tipos de cenários que você pode usar:
+
+### exec
+
+O tipo de cenário mais simples, onde você apenas especifica uma função a ser executada.
+
+```js
+export const options = {
+  scenarios: {
+    my_simple_scenario: {
+      exec: 'simple_function',
+      executor: 'shared-iterations',
+      vus: 10,
+      iterations: 100,
+    },
+  },
+};
+
+export function simple_function() {
+  // Seu código de teste aqui
+}
+```
+
+### constant-vus
+
+Mantém um número constante de VUs durante todo o teste.
+
+```js
+export const options = {
+  scenarios: {
+    constant_vus_scenario: {
+      executor: 'constant-vus',
+      vus: 10,
+      duration: '1m',
+    },
+  },
+};
+
+export default function () {
+  // Seu código de teste aqui
+}
+```
+
+### ramping-vus
+
+Permite que você aumente ou diminua o número de VUs durante o teste.
+
+```js
+export const options = {
+  scenarios: {
+    ramping_scenario: {
+      executor: 'ramping-vus',
+      startVUs: 0,
+      stages: [
+        { duration: '30s', target: 10 },
+        { duration: '30s', target: 0 },
+      ],
+    },
+  },
+};
+
+export default function () {
+  // Seu código de teste aqui
+}
+```
+
+### per-vu-iterations
+
+Cada VU executa um número específico de iterações.
+
+
+```js
+export const options = {
+  scenarios: {
+    per_vu_iterations_scenario: {
+      executor: 'per-vu-iterations',
+      vus: 2,
+      iterations: 10,
+    },
+  },
+};
+
+export default function () {
+  // Seu código de teste aqui
+}
+```
+
+### constant-arrival-rate
+
+Mantém uma taxa constante de novas iterações iniciadas por unidade de tempo.
+
+```js
+export const options = {
+  scenarios: {
+    constant_arrival_rate: {
+      executor: 'constant-arrival-rate',
+      rate: 1,
+      timeUnit: '1s',
+      duration: '1m',
+      preAllocatedVUs: 1,
+      maxVUs: 100,
+    },
+  },
+};
+
+export default function () {
+  // Seu código de teste aqui
+}
+```
+
+### ramping-arrival-rate
+
+Permite aumentar ou diminuir a taxa de chegada de novas iterações durante o teste.
+
+```js
+export const options = {
+  scenarios: {
+    ramping_arrival_rate: {
+      executor: 'ramping-arrival-rate',
+      startRate: 1,
+      timeUnit: '1s',
+      stages: [
+        { duration: '30s', target: 10 },
+        { duration: '30s', target: 0 },
+      ],
+      preAllocatedVUs: 1,
+      maxVUs: 100,
+    },
+  },
+};
+
+export default function () {
+  // Seu código de teste aqui
+}
+
+```
+
+Esses são apenas alguns exemplos. O recurso de Scenarios é muito flexível e permite que você combine diferentes estratégias para modelar o comportamento do usuário de maneira mais precisa. Consulte a documentação oficial para mais detalhes e opções.
+
+Doc: https://k6.io/docs/using-k6/scenarios/
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
