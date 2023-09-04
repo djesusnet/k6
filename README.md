@@ -768,7 +768,7 @@ export default () => {
 
 Além dos protocolos mencionados, o k6 tem um ecossistema de plugins e integrações que podem estender suas capacidades para suportar outros protocolos como MQTT, Apache Kafka, e mais. No entanto, essas extensões geralmente vêm da comunidade ou são contribuições externas e podem não ter o mesmo nível de suporte ou integração que os protocolos nativamente suportados.
 
-Docc : https://k6.io/docs/using-k6/protocols/
+Doc : https://k6.io/docs/using-k6/protocols/
 
 ## Scenarios (Cenários)
 
