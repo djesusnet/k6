@@ -1,6 +1,6 @@
 # K6 Performance Testing
 
-Este repositório é dedicado a fornecer recursos, exemplos para o uso do K6, uma ferramenta de teste de desempenho de código aberto para APIs, microsserviços e sistemas de back-end. K6 foi projetado para ser "como desenvolvedores escrevem testes", fornecendo uma sintaxe simples e eficaz para definir cenários de teste.
+Este repositório tem como finalidade disponibilizar recursos e exemplos práticos voltados para o uso do K6, uma ferramenta de código aberto especializada em testes de desempenho para APIs, microsserviços e sistemas de back-end. O objetivo é simplificar e enriquecer a experiência de uso do K6. Convidamos todos que desejem contribuir e compartilhar seu conhecimento a se juntarem a nós.
 
 ## O que é o k6 ?
 ![k6](https://raw.githubusercontent.com/grafana/k6/master/assets/k6-logo-with-grafana.svg)
@@ -1116,6 +1116,7 @@ k6 run --vus 10 --duration 1m --out influxdb=http://localhost:8086 script.js
 
 Observaremos no dashboard as métricas relacionadas à execução do teste de carga feito com o k6.
 
+Video: https://www.youtube.com/watch?v=66--zuutGiQ&t=989s&ab_channel=DanielJesus
 
 
 
