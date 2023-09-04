@@ -1118,8 +1118,21 @@ Observaremos no dashboard as métricas relacionadas à execução do teste de ca
 
 Video: https://www.youtube.com/watch?v=66--zuutGiQ&t=989s&ab_channel=DanielJesus
 
+## Vídeos para Entender e Dominar a Ferramenta K6
 
+Conhecendo o K6 para os testes de carga - https://youtu.be/gqvpco8uF6E?si=CQWsnNBZWtYNdJ_e
 
+Como configurar uma rampa de VUs ( usuários simultâneos ) nos seus testes de carga na ferramenta k6? - https://youtu.be/u43pMxAk1iU?si=eYIQbEVXZ9D9vLvi
+
+Apreendendo a utilizar o K6 HTML Report Exporter em seus testes de carga - https://youtu.be/8S9fxDqJlng?si=mPMO7vXIv-g46C8y
+
+Apreendendo a utilizar os options em seus testes de carga - https://youtu.be/-k1Feih5Yjo?si=VTOEFLJCTkrgGj7S
+
+Construindo uma pipeline de testes de carga com o k6 na plataforma Azure DevOps - https://youtu.be/4CNc8e0QurI?si=hJFeDUZ825H6rviz
+
+COMO FAZER TESTES DE CARGA E DESEMPENHO COM K6? - https://www.youtube.com/live/3rggoakSnCI?si=qzNF_Pe-Nb4kwj76
+
+Testes de Stress com K6 e Monitoramento Visual no Grafana + InfluxDB - https://youtu.be/66--zuutGiQ?si=k3xA7EMkfP6062xq
 
 
 
