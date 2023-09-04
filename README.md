@@ -230,7 +230,8 @@ export default function () {
 
 ### Visualização de Métricas
 
-![image](https://github.com/djesusnet/k6/assets/50085026/e5c35c29-b164-4e77-ac26-0bf55ee00d7c)
+![Screenshot 2023-08-31 092744](https://github.com/djesusnet/Cursok6/assets/50085026/acd5ba0b-956c-4740-bf26-c2f165c65bc0)
+
 
 
 
@@ -299,7 +300,8 @@ Os "checks" são especialmente úteis porque o k6 os contará para você. No fin
 
 Esses são exemplos básicos. A funcionalidade de "checks" é bastante flexível e permite uma ampla gama de asserções para validar o comportamento e desempenho do sistema que você está testando.
 
-![image](https://github.com/djesusnet/k6/assets/50085026/4d2eedcf-79e3-44f6-8974-a02cfe7396c9)
+![Screenshot 2023-08-31 094549](https://github.com/djesusnet/Cursok6/assets/50085026/f878c718-5869-4119-b7e1-677a04708032)
+
 
 
 ## Thresholds (Limiares) 
@@ -579,9 +581,9 @@ export default() =>{
 }
 ```
 
-![image](https://github.com/djesusnet/k6/assets/50085026/c816f4be-4654-4af6-af35-cf7601d1d9ab)
+![k6 report](https://github.com/djesusnet/Cursok6/assets/50085026/165b4d68-1493-4e7e-8816-95f10b38fa15)
 
-![image](https://github.com/djesusnet/k6/assets/50085026/ac6425b0-5ddf-406e-a5c1-aca841508232)
+![k6 report 2](https://github.com/djesusnet/Cursok6/assets/50085026/e79eaf4f-57de-4731-bebb-c9cbca6aed80)
 
 Video: https://www.youtube.com/watch?v=8S9fxDqJlng&ab_channel=DanielJesus
 
@@ -1050,7 +1052,8 @@ docker-compose up
 
 Após baixar as imagens do Grafana e do InfluxDB, certifique-se de verificar se os respectivos contêineres estão em execução no Docker, conforme indicado na imagem abaixo:
 
-![image](https://github.com/djesusnet/k6/assets/50085026/f50ba275-cef5-42c0-ae3b-4e39d0e79483)
+![Screenshot 2023-09-03 221255](https://github.com/djesusnet/Cursok6/assets/50085026/029ffe69-d3ba-46f1-a5fb-46e5f537619a)
+
 
 #### Configurar a conexão do influxDB
 
@@ -1087,7 +1090,8 @@ Após baixar as imagens do Grafana e do InfluxDB, certifique-se de verificar se 
 
 Se a conexão for bem-sucedida, você verá uma mensagem confirmando que tudo está funcionando como esperado. A partir desse ponto, você pode começar a criar dashboards e painéis no Grafana para visualizar suas métricas armazenadas no InfluxDB.
 
-![image](https://github.com/djesusnet/k6/assets/50085026/e400b32e-86ee-4df6-b75b-388285eb4587)
+![Screenshot 2023-09-03 221502](https://github.com/djesusnet/Cursok6/assets/50085026/3e1b35dc-9791-4f74-9b00-0b2d62f88e16)
+
 
 Após estabelecermos com sucesso a conexão com o InfluxDB no Grafana, o próximo passo é criar um dashboard específico para monitorar os testes de carga realizados com o k6.
 
@@ -1098,7 +1102,8 @@ Template : https://grafana.com/grafana/dashboards/2587-k6-load-testing-results/
 
 Em seguida, procederemos à importação deste template de dashboard no Grafana, conforme ilustrado na imagem abaixo:
 
-![image](https://github.com/djesusnet/k6/assets/50085026/2899e990-9693-4de3-90a0-ae898e618fe5)
+![Screenshot 2023-09-03 222655](https://github.com/djesusnet/Cursok6/assets/50085026/122dfc81-b4ce-4a5b-a757-576f4b079d96)
+
 
 A seguir, vamos realizar nosso teste de carga utilizando o k6. Para isso, execute o seguinte comando no terminal:
 
@@ -1106,7 +1111,7 @@ A seguir, vamos realizar nosso teste de carga utilizando o k6. Para isso, execut
 k6 run --vus 10 --duration 1m --out influxdb=http://localhost:8086 script.js
 ```
 
-![image](https://github.com/djesusnet/k6/assets/50085026/47ce8139-d79b-48cb-b05c-12fff2e117a2)
+![Screenshot 2023-09-03 223112](https://github.com/djesusnet/Cursok6/assets/50085026/9efae6fd-69d0-45a8-9896-acf67ce40fae)
 
 
 Observaremos no dashboard as métricas relacionadas à execução do teste de carga feito com o k6.
