@@ -1,6 +1,6 @@
 # K6 Performance Testing
 
-Este repositório é dedicado a fornecer recursos, exemplos e melhores práticas para o uso do K6, uma ferramenta de teste de desempenho de código aberto para APIs, microsserviços e sistemas de back-end. K6 foi projetado para ser "como desenvolvedores escrevem testes", fornecendo uma sintaxe simples e eficaz para definir cenários de teste.
+Este repositório é dedicado a fornecer recursos, exemplos para o uso do K6, uma ferramenta de teste de desempenho de código aberto para APIs, microsserviços e sistemas de back-end. K6 foi projetado para ser "como desenvolvedores escrevem testes", fornecendo uma sintaxe simples e eficaz para definir cenários de teste.
 
 ## O que é o k6 ?
 ![k6](https://raw.githubusercontent.com/grafana/k6/master/assets/k6-logo-with-grafana.svg)
