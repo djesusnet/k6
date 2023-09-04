@@ -964,7 +964,156 @@ Cada objeto JSON representa um ponto de dados para uma métrica específica. O c
 Você pode então importar este arquivo JSON para ferramentas de análise de dados, bancos de dados ou até mesmo processá-lo manualmente para extrair informações úteis.
 
 
-### Testes de Stress com K6 e Monitoramento Visual no Grafana + InfluxDB
+### CSV
+
+Semelhante ao JSON, mas em formato CSV.
+
+```
+k6 run --out csv=metrics.csv script.js
+```
+
+### Datadog
+
+Se você está usando Datadog para monitoramento, o k6 pode enviar métricas diretamente para o Datadog.
+
+```
+k6 run --out datadog script.js
+```
+
+### Prometheus
+
+O k6 também suporta a exportação de métricas no formato Prometheus, o que é útil se você estiver usando o Prometheus para monitoramento.
+
+```
+k6 run --out prometheus script.js
+```
+
+### Kafka, Cloud e outros
+
+O ecossistema de outputs do k6 está crescendo, e outros sistemas como Apache Kafka, Google Cloud e Amazon CloudWatch também são suportados, muitas vezes através de extensões e plugins.
+
+Para configurar essas saídas, você geralmente especificará as configurações na linha de comando ou no seu script de teste. Você também pode usar várias saídas simultaneamente.
+
+Consulte a documentação oficial para obter informações detalhadas sobre como configurar cada tipo de output.
+
+Doc: https://k6.io/docs/results-output/real-time/
+
+## Testes de Stress com K6 e Monitoramento Visual no Grafana + InfluxDB
+
+Realizar testes de estresse com k6 e monitorá-los usando Grafana e InfluxDB é uma combinação comum e eficaz. Abaixo estão os passos básicos e um exemplo para ajudá-lo a começar.
+
+Requisitos
+
+- Ter o Docker instalado
+- Ter o k6 instalado para execução dos testes de carga.
+
+### Executando o Docker Compose:
+
+Criar um arquivo docker-compose.yml: Crie um arquivo docker-compose.yml no diretório do projeto. Este arquivo descreverá os serviços que compõem o projeto. Por exemplo:
+
+```yaml
+version: '3.4'
+
+networks:
+  k6:
+  grafana:
+
+services:
+  influxdb:
+    image: influxdb:1.8
+    networks:
+      - grafana
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+```
+
+Iniciar os serviços: Abra um terminal e navegue até o diretório onde o arquivo docker-compose.yml está localizado. Execute o seguinte comando para iniciar todos os serviços descritos no arquivo:
+```
+docker-compose up
+```
+
+Após baixar as imagens do Grafana e do InfluxDB, certifique-se de verificar se os respectivos contêineres estão em execução no Docker, conforme indicado na imagem abaixo:
+
+![image](https://github.com/djesusnet/k6/assets/50085026/f50ba275-cef5-42c0-ae3b-4e39d0e79483)
+
+#### Configurar a conexão do influxDB
+
+ Vamos realizar a configuração da conexão com o InfluxDB ao Grafana:
+
+#### Pré-requisitos:
+
+- Certifique-se de que você tem uma instância do InfluxDB em execução.
+- Tenha certeza de que o Grafana também está rodando.
+
+#### Configuração da Conexão no Grafana:
+1- Acesse o Grafana: Abra o seu navegador web e vá para a URL onde o seu servidor Grafana está rodando, geralmente é http://localhost:3000 para instalações locais.
+
+2- Login: Faça login no Grafana usando suas credenciais.
+
+3- Adicionar Fonte de Dados:
+- Vá até o ícone de engrenagem (Configurações) no lado esquerdo da tela e clique em "Data Sources".
+- Clique no botão "Add data source".
+
+
+4- Escolha InfluxDB:
+- Nas opções de fontes de dados, clique em "InfluxDB".
+
+
+5- Configure os Detalhes da Conexão:
+- HTTP URL: Coloque a URL onde o InfluxDB está rodando, geralmente é http://localhost:8086 para uma instalação local.
+- Database: Nome do banco de dados InfluxDB que você deseja conectar.
+- User: O nome do usuário, se você tiver autenticação ativada no InfluxDB.
+- Password: A senha do usuário.
+
+
+6- Salvar e Testar:
+- Depois de preencher os detalhes, clique no botão "Save & Test" para verificar se a conexão foi estabelecida com sucesso.
+
+Se a conexão for bem-sucedida, você verá uma mensagem confirmando que tudo está funcionando como esperado. A partir desse ponto, você pode começar a criar dashboards e painéis no Grafana para visualizar suas métricas armazenadas no InfluxDB.
+
+![image](https://github.com/djesusnet/k6/assets/50085026/e400b32e-86ee-4df6-b75b-388285eb4587)
+
+Após estabelecermos com sucesso a conexão com o InfluxDB no Grafana, o próximo passo é criar um dashboard específico para monitorar os testes de carga realizados com o k6.
+
+
+Para facilitar esse processo, utilizaremos um template pré-configurado disponível no Grafana, que já inclui um dashboard completo dedicado à monitorização de testes de carga realizados com o k6.
+
+Template : https://grafana.com/grafana/dashboards/2587-k6-load-testing-results/
+
+Em seguida, procederemos à importação deste template de dashboard no Grafana, conforme ilustrado na imagem abaixo:
+
+![image](https://github.com/djesusnet/k6/assets/50085026/2899e990-9693-4de3-90a0-ae898e618fe5)
+
+A seguir, vamos realizar nosso teste de carga utilizando o k6. Para isso, execute o seguinte comando no terminal:
+
+```
+k6 run --vus 10 --duration 1m --out influxdb=http://localhost:8086 script.js
+```
+
+![image](https://github.com/djesusnet/k6/assets/50085026/47ce8139-d79b-48cb-b05c-12fff2e117a2)
+
+
+Observaremos no dashboard as métricas relacionadas à execução do teste de carga feito com o k6.
+
+
+
+
 
 
 
